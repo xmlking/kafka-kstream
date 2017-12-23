@@ -17,11 +17,11 @@ import java.util.Arrays;
 import java.util.Date;
 
 @Configuration
-@EnableConfigurationProperties(WordCountProcessorProperties.class)
 public class WordCountProcessor {
+    private String storeName = "WordCounts";
 
     @Autowired
-    private WordCountProcessorProperties processorProperties;
+    private TimeWindows  timeWindows;
 
     @StreamListener("input")
     @SendTo("output")
@@ -31,57 +31,13 @@ public class WordCountProcessor {
                 .flatMapValues(value -> Arrays.asList(value.toLowerCase().split("\\W+")))
                 .map((key, value) -> new KeyValue<>(value, value))
                 .groupByKey(Serdes.String(), Serdes.String())
-                .count(configuredTimeWindow(), processorProperties.getStoreName())
+                .count(timeWindows, storeName)
                 .toStream()
                 .map((key, value) -> new KeyValue<>(null, new WordCount(key.key(), value, new Date(key.window().start()), new Date(key.window().end()))));
     }
 
-    /**
-     * Constructs a {@link TimeWindows} property.
-     *
-     * @return
-     */
-    private TimeWindows configuredTimeWindow() {
-        return processorProperties.getAdvanceBy() > 0
-                ? TimeWindows.of(processorProperties.getWindowLength()).advanceBy(processorProperties.getAdvanceBy())
-                : TimeWindows.of(processorProperties.getWindowLength());
-    }
 }
 
-
-@ConfigurationProperties(prefix = "kstream.word.count")
- class  WordCountProcessorProperties {
-
-    private int windowLength = 5000;
-
-    private int advanceBy = 0;
-
-    private String storeName = "WordCounts";
-
-    int getWindowLength() {
-        return windowLength;
-    }
-
-    public void setWindowLength(int windowLength) {
-        this.windowLength = windowLength;
-    }
-
-    int getAdvanceBy() {
-        return advanceBy;
-    }
-
-    public void setAdvanceBy(int advanceBy) {
-        this.advanceBy = advanceBy;
-    }
-
-    String getStoreName() {
-        return storeName;
-    }
-
-    public void setStoreName(String storeName) {
-        this.storeName = storeName;
-    }
-}
 
 class WordCount {
 
