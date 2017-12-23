@@ -3,8 +3,8 @@ Kafka-kstream-test
 
 
 ### Issue
-    code works with `org.springframework.cloud:spring-cloud-stream-binder-kstream` and Kafka 0.11
-    but not with `org.springframework.cloud:spring-cloud-stream-binder-kstream11:1.3.0.RELEASE` and Kafka 0.11
+    code works with `org.springframework.cloud:spring-cloud-stream-binder-kstream` and Kafka 0.10.1.1
+    but not with `org.springframework.cloud:spring-cloud-stream-binder-kstream11:1.3.0.RELEASE` and Kafka 0.11.0.1
 
 ### How to reproduce
 ```bash
